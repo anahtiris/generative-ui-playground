@@ -1,5 +1,7 @@
 export interface MockScenario {
   keywords: string[];
+  label: string;
+  sampleMessage: string;
   toolName: string;
   input: Record<string, unknown>;
 }
@@ -7,6 +9,8 @@ export interface MockScenario {
 export const mockScenarios: MockScenario[] = [
   {
     keywords: ["form", "identity", "verify", "passport", "ยืนยันตัวตน"],
+    label: "Verify my identity",
+    sampleMessage: "I need to verify my identity",
     toolName: "request_form",
     input: {
       form_type: "identity_verification",
@@ -21,9 +25,11 @@ export const mockScenarios: MockScenario[] = [
   },
   {
     keywords: ["dashboard", "metrics", "chart", "แดชบอร์ด"],
+    label: "Show a dashboard",
+    sampleMessage: "Show me a dashboard",
     toolName: "request_dashboard",
     input: {
-      title: "Relocation Applications — Last 30 Days",
+      title: "Relocation Applications - Last 30 Days",
       widgets: [
         { kind: "stat_card", title: "Total Applications", data: [{ value: 128 }] },
         {
@@ -41,6 +47,8 @@ export const mockScenarios: MockScenario[] = [
   },
   {
     keywords: ["blackboard", "diagram", "teach", "explain", "how does", "สอน", "อธิบาย"],
+    label: "Explain a process",
+    sampleMessage: "Explain how this works",
     toolName: "request_diagram",
     input: {
       title: "How the Anmeldung Process Works",
