@@ -6,3 +6,6 @@ export type {
   ChatStreamEvent,
   Suggestion,
 } from "./types";
+
+export { GenerativeUIRouter } from "./GenerativeUIRouter";
+export type { RendererMap } from "./GenerativeUIRouter";
