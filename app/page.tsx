@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { GenerativeUIRouter, type RenderPayload } from "../components/generative-ui/GenerativeUIRouter";
 import type { ChatMessage } from "../lib/llm/types";
+import { mockScenarios } from "../mock/fixtures";
 
 type Turn =
   | { kind: "user"; text: string }
@@ -33,6 +34,7 @@ export default function Home() {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [remainingChips, setRemainingChips] = useState<string[]>(() => mockScenarios.map((s) => s.label));
 
   async function send(nextHistory: ChatMessage[]) {
     setLoading(true);
@@ -73,14 +75,24 @@ export default function Home() {
     }
   }
 
+  function submitMessage(text: string) {
+    if (!text.trim() || loading) return;
+    const nextHistory: ChatMessage[] = [...history, { role: "user", content: text }];
+    setHistory(nextHistory);
+    setTurns((t) => [...t, { kind: "user", text }]);
+    send(nextHistory);
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!input.trim() || loading) return;
-    const nextHistory: ChatMessage[] = [...history, { role: "user", content: input }];
-    setHistory(nextHistory);
-    setTurns((t) => [...t, { kind: "user", text: input }]);
+    const text = input;
     setInput("");
-    send(nextHistory);
+    submitMessage(text);
+  }
+
+  function handleChipClick(label: string, sampleMessage: string) {
+    setRemainingChips((chips) => chips.filter((l) => l !== label));
+    submitMessage(sampleMessage);
   }
 
   return (
@@ -122,9 +134,29 @@ export default function Home() {
             </div>
           );
         })}
-        {loading && <p className="text-sm text-gray-400">Thinking…</p>}
+        {loading && <p className="text-sm text-gray-400">Thinking...</p>}
         {error && <p className="text-sm text-red-500">{error}</p>}
       </div>
+
+      {remainingChips.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {remainingChips.map((label) => {
+            const scenario = mockScenarios.find((s) => s.label === label);
+            if (!scenario) return null;
+            return (
+              <button
+                key={label}
+                type="button"
+                onClick={() => handleChipClick(scenario.label, scenario.sampleMessage)}
+                disabled={loading}
+                className="rounded-full border px-3 py-1 text-sm hover:bg-gray-100 disabled:opacity-50"
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="flex gap-2">
         <input
