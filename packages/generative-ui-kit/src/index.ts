@@ -19,3 +19,5 @@ export { diagramToolDefinition, diagramToolHandler } from "./tools/diagram";
 export { SecureFormRenderer } from "./renderers/SecureFormRenderer";
 export type { Field, FormSubmitResult } from "./renderers/SecureFormRenderer";
 export { formToolDefinition, formToolHandler } from "./tools/form";
+
+export { useSendMessage } from "./sendMessageContext";
