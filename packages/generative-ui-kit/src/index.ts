@@ -12,3 +12,6 @@ export type { RendererMap } from "./GenerativeUIRouter";
 
 export { DashboardRenderer } from "./renderers/DashboardRenderer";
 export { dashboardToolDefinition, dashboardToolHandler } from "./tools/dashboard";
+
+export { BlackboardRenderer } from "./renderers/BlackboardRenderer";
+export { diagramToolDefinition, diagramToolHandler } from "./tools/diagram";
