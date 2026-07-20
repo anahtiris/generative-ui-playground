@@ -15,3 +15,7 @@ export { dashboardToolDefinition, dashboardToolHandler } from "./tools/dashboard
 
 export { BlackboardRenderer } from "./renderers/BlackboardRenderer";
 export { diagramToolDefinition, diagramToolHandler } from "./tools/diagram";
+
+export { SecureFormRenderer } from "./renderers/SecureFormRenderer";
+export type { Field, FormSubmitResult } from "./renderers/SecureFormRenderer";
+export { formToolDefinition, formToolHandler } from "./tools/form";
