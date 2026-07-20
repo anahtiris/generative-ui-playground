@@ -9,3 +9,6 @@ export type {
 
 export { GenerativeUIRouter } from "./GenerativeUIRouter";
 export type { RendererMap } from "./GenerativeUIRouter";
+
+export { DashboardRenderer } from "./renderers/DashboardRenderer";
+export { dashboardToolDefinition, dashboardToolHandler } from "./tools/dashboard";
