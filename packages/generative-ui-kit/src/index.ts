@@ -20,4 +20,8 @@ export { SecureFormRenderer } from "./renderers/SecureFormRenderer";
 export type { Field, FormSubmitResult } from "./renderers/SecureFormRenderer";
 export { formToolDefinition, formToolHandler } from "./tools/form";
 
+export { QuestionRenderer } from "./renderers/QuestionRenderer";
+export type { QuestionOption } from "./renderers/QuestionRenderer";
+export { questionToolDefinition, questionToolHandler } from "./tools/question";
+
 export { useSendMessage } from "./sendMessageContext";
