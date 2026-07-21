@@ -25,3 +25,7 @@ export type { QuestionOption } from "./renderers/QuestionRenderer";
 export { questionToolDefinition, questionToolHandler } from "./tools/question";
 
 export { useSendMessage } from "./sendMessageContext";
+
+export { TableRenderer } from "./renderers/TableRenderer";
+export type { TableColumn } from "./renderers/TableRenderer";
+export { tableToolDefinition, tableToolHandler } from "./tools/table";
