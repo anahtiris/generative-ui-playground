@@ -1,14 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { GenerativeUIRouter, type RenderPayload } from "../components/generative-ui/GenerativeUIRouter";
-import type { ChatMessage } from "../lib/llm/types";
+import { GenerativeChat, defaultRenderers } from "generative-ui-kit";
+import type { ChatMessage, ChatStreamEvent, RenderPayload, Suggestion, FormSubmitResult } from "generative-ui-kit";
 import { mockScenarios } from "../mock/fixtures";
 
-type Turn =
-  | { kind: "user"; text: string }
-  | { kind: "assistant_text"; text: string }
-  | { kind: "assistant_render"; payload: RenderPayload };
+const PROVIDERS = [
+  { id: "mock", label: "Mock (no API calls)" },
+  { id: "anthropic", label: "Claude (Anthropic)" },
+  { id: "openai", label: "GPT (OpenAI)" },
+];
+
+// Computed once at module scope, not inside the component body: GenerativeChat
+// resets its visible chip row whenever the `suggestions` array reference
+// changes, so this must stay a stable reference across renders.
+const suggestions: Suggestion[] = mockScenarios.map((s) => ({ label: s.label, sampleMessage: s.sampleMessage }));
 
 type ChatApiResponse =
   | { type: "text"; text: string }
@@ -21,78 +27,57 @@ type ChatApiResponse =
       forModel: Record<string, unknown>;
     };
 
-const PROVIDERS = [
-  { id: "mock", label: "Mock (no API calls)" },
-  { id: "anthropic", label: "Claude (Anthropic)" },
-  { id: "openai", label: "GPT (OpenAI)" },
-];
+async function submitForm(sessionId: string, values: Record<string, string>): Promise<FormSubmitResult> {
+  try {
+    const res = await fetch("/api/forms/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId, values }),
+    });
+    if (!res.ok) return { status: "error", message: "Submission failed" };
+    return { status: "submitted" };
+  } catch {
+    return { status: "error", message: "Submission failed" };
+  }
+}
 
 export default function Home() {
   const [providerId, setProviderId] = useState("mock");
-  const [input, setInput] = useState("");
-  const [history, setHistory] = useState<ChatMessage[]>([]);
-  const [turns, setTurns] = useState<Turn[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [remainingChips, setRemainingChips] = useState<string[]>(() => mockScenarios.map((s) => s.label));
 
-  async function send(nextHistory: ChatMessage[]) {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextHistory, providerId }),
-      });
-      if (!res.ok) throw new Error(`Chat request failed (${res.status})`);
-      const data: ChatApiResponse = await res.json();
+  async function* onSend(messages: ChatMessage[]): AsyncIterable<ChatStreamEvent> {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages, providerId }),
+    });
+    if (!res.ok) throw new Error(`Chat request failed (${res.status})`);
+    const data: ChatApiResponse = await res.json();
 
-      if (data.type === "text") {
-        setHistory([...nextHistory, { role: "assistant", content: data.text }]);
-        setTurns((t) => [...t, { kind: "assistant_text", text: data.text }]);
-        return;
-      }
-
-      setHistory([
-        ...nextHistory,
-        {
-          role: "assistant",
-          content: "",
-          toolCall: { id: data.toolCallId, name: data.toolName, input: data.input },
-        },
-        {
-          role: "tool",
-          content: "",
-          toolResult: { toolCallId: data.toolCallId, output: data.forModel },
-        },
-      ]);
-      setTurns((t) => [...t, { kind: "assistant_render", payload: data.render }]);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setLoading(false);
+    if (data.type === "text") {
+      yield { type: "text_done", text: data.text };
+      return;
     }
-  }
 
-  function submitMessage(text: string) {
-    if (!text.trim() || loading) return;
-    const nextHistory: ChatMessage[] = [...history, { role: "user", content: text }];
-    setHistory(nextHistory);
-    setTurns((t) => [...t, { kind: "user", text }]);
-    send(nextHistory);
-  }
+    // SecureFormRenderer needs a real onSubmit function, which the library's
+    // formToolHandler can't supply (it doesn't know this host's submission
+    // endpoint) — this host-side onSend is exactly where that gets attached.
+    const props =
+      data.render.component === "SecureFormRenderer"
+        ? {
+            ...data.render.props,
+            onSubmit: (values: Record<string, string>) =>
+              submitForm((data.render.props as { sessionId: string }).sessionId, values),
+          }
+        : data.render.props;
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const text = input;
-    setInput("");
-    submitMessage(text);
-  }
-
-  function handleChipClick(label: string, sampleMessage: string) {
-    setRemainingChips((chips) => chips.filter((l) => l !== label));
-    submitMessage(sampleMessage);
+    yield {
+      type: "tool_call",
+      toolCallId: data.toolCallId,
+      toolName: data.toolName,
+      input: data.input,
+      render: { component: data.render.component, props },
+      forModel: data.forModel,
+    };
   }
 
   return (
@@ -112,67 +97,7 @@ export default function Home() {
         </select>
       </div>
 
-      <div className="space-y-4">
-        {turns.map((t, i) => {
-          if (t.kind === "user") {
-            return (
-              <div key={i} className="ml-auto max-w-[80%] rounded-lg bg-black px-3 py-2 text-sm text-white">
-                {t.text}
-              </div>
-            );
-          }
-          if (t.kind === "assistant_text") {
-            return (
-              <div key={i} className="max-w-[80%] rounded-lg border px-3 py-2 text-sm">
-                {t.text}
-              </div>
-            );
-          }
-          return (
-            <div key={i}>
-              <GenerativeUIRouter payload={t.payload} />
-            </div>
-          );
-        })}
-        {loading && <p className="text-sm text-gray-400">Thinking...</p>}
-        {error && <p className="text-sm text-red-500">{error}</p>}
-      </div>
-
-      {remainingChips.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {remainingChips.map((label) => {
-            const scenario = mockScenarios.find((s) => s.label === label);
-            if (!scenario) return null;
-            return (
-              <button
-                key={label}
-                type="button"
-                onClick={() => handleChipClick(scenario.label, scenario.sampleMessage)}
-                disabled={loading}
-                className="rounded-full border px-3 py-1 text-sm hover:bg-gray-100 disabled:opacity-50"
-              >
-                {label}
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder='Try "form", "dashboard", or "explain how this works"'
-          className="flex-1 rounded border px-3 py-2 text-sm"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
-        >
-          Send
-        </button>
-      </form>
+      <GenerativeChat onSend={onSend} suggestions={suggestions} renderers={defaultRenderers} />
     </main>
   );
 }

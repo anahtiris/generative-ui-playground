@@ -66,4 +66,38 @@ export const mockScenarios: MockScenario[] = [
       ],
     },
   },
+  {
+    keywords: ["question", "ask me", "clarify"],
+    label: "Ask me a question",
+    sampleMessage: "Ask me a clarifying question",
+    toolName: "ask_question",
+    input: {
+      question: "Would you like a one-time or a multi-entry visa?",
+      question_type: "multiple_choice",
+      options: [
+        { label: "One-time", value: "one_time" },
+        { label: "Multi-entry", value: "multi_entry" },
+      ],
+      allow_free_text: true,
+    },
+  },
+  {
+    keywords: ["table", "list", "slots"],
+    label: "Show a table",
+    sampleMessage: "Show me a table of appointment slots",
+    toolName: "request_table",
+    input: {
+      title: "Available Anmeldung Appointment Slots",
+      columns: [
+        { key: "date", label: "Date" },
+        { key: "time", label: "Time" },
+        { key: "office", label: "Office" },
+      ],
+      rows: [
+        { date: "2026-08-03", time: "09:00", office: "Mitte" },
+        { date: "2026-08-04", time: "11:30", office: "Kreuzberg" },
+        { date: "2026-08-05", time: "14:00", office: "Mitte" },
+      ],
+    },
+  },
 ];
