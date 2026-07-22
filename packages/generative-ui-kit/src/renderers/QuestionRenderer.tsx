@@ -39,7 +39,7 @@ export function QuestionRenderer({
   }
 
   return (
-    <div className="rounded-lg border p-4 space-y-3">
+    <div className="rounded-lg border border-gray-300 dark:border-gray-600 text-black dark:text-white p-4 space-y-3">
       <p className="text-sm font-medium">{question}</p>
       {!answered && (
         <>
@@ -49,7 +49,7 @@ export function QuestionRenderer({
                 key={opt.value}
                 type="button"
                 onClick={() => choose(opt.label)}
-                className="rounded-full border px-3 py-1 text-sm hover:bg-gray-100"
+                className="rounded-full border border-gray-300 dark:border-gray-600 px-3 py-1 text-sm hover:bg-gray-100 dark:hover:bg-neutral-800"
               >
                 {opt.label}
               </button>
@@ -61,16 +61,16 @@ export function QuestionRenderer({
                 value={freeText}
                 onChange={(e) => setFreeText(e.target.value)}
                 placeholder="Other…"
-                className="flex-1 rounded border px-2 py-1 text-sm"
+                className="flex-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 text-black dark:text-white px-2 py-1 text-sm"
               />
-              <button type="submit" className="rounded border px-3 py-1 text-sm">
+              <button type="submit" className="rounded border border-gray-300 dark:border-gray-600 px-3 py-1 text-sm">
                 Send
               </button>
             </form>
           )}
         </>
       )}
-      {answered && <p className="text-sm text-gray-400">Answer sent.</p>}
+      {answered && <p className="text-sm text-gray-500 dark:text-gray-400">Answer sent.</p>}
     </div>
   );
 }

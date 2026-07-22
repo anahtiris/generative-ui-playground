@@ -81,13 +81,13 @@ export default function Home() {
   }
 
   return (
-    <main className="mx-auto max-w-2xl p-6 space-y-4">
+    <main className="mx-auto max-w-2xl p-6 space-y-4 bg-white text-black dark:bg-neutral-900 dark:text-white min-h-screen">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Generative UI Chat</h1>
         <select
           value={providerId}
           onChange={(e) => setProviderId(e.target.value)}
-          className="rounded border px-2 py-1 text-sm"
+          className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 px-2 py-1 text-sm"
         >
           {PROVIDERS.map((p) => (
             <option key={p.id} value={p.id}>

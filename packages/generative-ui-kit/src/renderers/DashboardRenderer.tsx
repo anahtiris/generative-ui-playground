@@ -10,12 +10,12 @@ interface Widget {
 
 export function DashboardRenderer({ title, widgets }: { title: string; widgets: Widget[] }) {
   return (
-    <div className="rounded-lg border p-4 space-y-4">
+    <div className="rounded-lg border border-gray-300 dark:border-gray-600 text-black dark:text-white p-4 space-y-4">
       <h3 className="font-semibold">{title}</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {widgets.map((w, i) => (
-          <div key={i} className="rounded border p-3">
-            <p className="text-sm text-gray-500 mb-2">{w.title}</p>
+          <div key={i} className="rounded border border-gray-200 dark:border-gray-700 p-3">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{w.title}</p>
             {renderWidget(w)}
           </div>
         ))}
@@ -62,7 +62,7 @@ function renderWidget(w: Widget) {
           <thead>
             <tr>
               {keys.map((k) => (
-                <th key={k} className="text-left border-b py-1 font-medium">
+                <th key={k} className="text-left border-b border-gray-300 dark:border-gray-600 py-1 font-medium">
                   {k}
                 </th>
               ))}
@@ -72,7 +72,7 @@ function renderWidget(w: Widget) {
             {data.map((row, i) => (
               <tr key={i}>
                 {Object.values(row).map((v, j) => (
-                  <td key={j} className="border-t py-1">
+                  <td key={j} className="border-t border-gray-200 dark:border-gray-700 py-1">
                     {String(v)}
                   </td>
                 ))}

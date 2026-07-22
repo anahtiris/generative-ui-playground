@@ -61,7 +61,7 @@ export function SecureFormRenderer({
           required={f.required}
           defaultValue=""
           onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))}
-          className="rounded border px-2 py-1"
+          className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 text-black dark:text-white px-2 py-1"
         >
           <option value="" disabled>
             Select…
@@ -89,7 +89,7 @@ export function SecureFormRenderer({
         <textarea
           required={f.required}
           onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))}
-          className="rounded border px-2 py-1"
+          className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 text-black dark:text-white px-2 py-1"
         />
       );
     }
@@ -98,29 +98,36 @@ export function SecureFormRenderer({
         type={f.type === "file" ? "file" : f.type === "date" ? "date" : "text"}
         required={f.required}
         onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))}
-        className="rounded border px-2 py-1"
+        className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 text-black dark:text-white px-2 py-1"
       />
     );
   }
 
   if (status === "done") {
     return (
-      <p className="text-sm text-green-600">
+      <p className="text-sm text-green-600 dark:text-green-400">
         Submitted securely. Reference: {referenceNumber ?? sessionId.slice(0, 8)}
       </p>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-lg border p-4 space-y-3">
-      <p className="text-sm text-gray-500">{purpose}</p>
+    <form
+      onSubmit={handleSubmit}
+      className="rounded-lg border border-gray-300 dark:border-gray-600 text-black dark:text-white p-4 space-y-3"
+    >
+      <p className="text-sm text-gray-500 dark:text-gray-400">{purpose}</p>
       {fields.map((f) => (
         <div key={f.name} className="flex flex-col gap-1">
           <label className="text-sm font-medium">{f.label}</label>
           {renderField(f)}
         </div>
       ))}
-      <button type="submit" disabled={status === "submitting"} className="rounded bg-black px-3 py-1.5 text-white text-sm">
+      <button
+        type="submit"
+        disabled={status === "submitting"}
+        className="rounded bg-black text-white dark:bg-white dark:text-black px-3 py-1.5 text-sm"
+      >
         {status === "submitting" ? "Submitting…" : "Submit securely"}
       </button>
       {status === "error" && <p className="text-sm text-red-500">{errorMessage ?? "Something went wrong — try again."}</p>}
