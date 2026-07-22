@@ -35,7 +35,7 @@ export function QuestionRenderer({
     e.preventDefault();
     if (!freeText.trim()) return;
     setAnswered(true);
-    sendMessage(freeText);
+    sendMessage(freeText.trim());
   }
 
   return (

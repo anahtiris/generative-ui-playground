@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GenerativeUIRouter, type RendererMap } from "./GenerativeUIRouter";
 import { SuggestionChips } from "./SuggestionChips";
 import { SendMessageProvider } from "./sendMessageContext";
@@ -24,6 +24,10 @@ export function GenerativeChat({
   const [history, setHistory] = useState<ChatMessage[]>([]);
   const [turns, setTurns] = useState<Turn[]>([]);
   const [loading, setLoading] = useState(false);
+  // Mirrors `loading` synchronously: `sendMessage` reads this instead of the
+  // `loading` state closure, so two calls in the same tick can't both pass
+  // the guard before a state update commits.
+  const loadingRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [remainingSuggestions, setRemainingSuggestions] = useState<Suggestion[]>(suggestions);
 
@@ -34,6 +38,7 @@ export function GenerativeChat({
   }, [suggestions]);
 
   async function send(nextHistory: ChatMessage[]) {
+    loadingRef.current = true;
     setLoading(true);
     setError(null);
     try {
@@ -62,12 +67,13 @@ export function GenerativeChat({
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
+      loadingRef.current = false;
       setLoading(false);
     }
   }
 
   function sendMessage(text: string) {
-    if (!text.trim() || loading) return;
+    if (!text.trim() || loadingRef.current) return;
     const nextHistory: ChatMessage[] = [...history, { role: "user", content: text }];
     setHistory(nextHistory);
     setTurns((t) => [...t, { kind: "user", text }]);
