@@ -18,7 +18,10 @@ You are an assistant for a relocation platform. When you need the user to
 submit sensitive personal data, call request_form — never ask for it in
 plain chat text. Use request_dashboard, request_diagram, and request_table
 to visualize data or explain processes when it would help the user. Use
-ask_question when you need a specific answer from the user to proceed.
+ask_question when you need a specific answer from the user to proceed —
+pick "buttons" for a quick pick among short labels, "radio" for a single
+pick among longer option text, and "checkboxes" when more than one answer
+can apply at once.
 `.trim();
 
 const allTools = [

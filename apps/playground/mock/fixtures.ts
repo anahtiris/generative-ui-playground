@@ -67,16 +67,49 @@ export const mockScenarios: MockScenario[] = [
     },
   },
   {
-    keywords: ["question", "ask me", "clarify"],
+    keywords: ["clarifying", "clarify"],
     label: "Ask me a question",
     sampleMessage: "Ask me a clarifying question",
     toolName: "ask_question",
     input: {
       question: "Would you like a one-time or a multi-entry visa?",
-      question_type: "multiple_choice",
+      question_type: "buttons",
       options: [
         { label: "One-time", value: "one_time" },
         { label: "Multi-entry", value: "multi_entry" },
+      ],
+      allow_free_text: true,
+    },
+  },
+  {
+    keywords: ["longer preference", "radio"],
+    label: "Ask a longer question",
+    sampleMessage: "Ask me a longer preference question",
+    toolName: "ask_question",
+    input: {
+      question: "Which appointment reminder would you prefer?",
+      question_type: "radio",
+      options: [
+        { label: "Email me 3 days before my Anmeldung appointment", value: "email_3d" },
+        { label: "Text me the morning of my Anmeldung appointment", value: "sms_morning" },
+        { label: "Don't send me any reminders — I'll check the portal myself", value: "none" },
+      ],
+      allow_free_text: true,
+    },
+  },
+  {
+    keywords: ["pick multiple", "checkboxes"],
+    label: "Ask a multi-select question",
+    sampleMessage: "Ask me a question where I can pick multiple answers",
+    toolName: "ask_question",
+    input: {
+      question: "Which documents have you already prepared?",
+      question_type: "checkboxes",
+      options: [
+        { label: "Passport", value: "passport" },
+        { label: "Proof of address", value: "address_proof" },
+        { label: "Rental contract", value: "rental_contract" },
+        { label: "Health insurance confirmation", value: "health_insurance" },
       ],
       allow_free_text: true,
     },
