@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "generative-ui-kit/theme.css";
 
 export const metadata: Metadata = {
   title: "Generative UI Chat",

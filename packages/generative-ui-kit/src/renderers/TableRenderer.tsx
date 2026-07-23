@@ -15,13 +15,13 @@ export function TableRenderer({
   rows: Record<string, unknown>[];
 }) {
   return (
-    <div className="rounded-lg border border-gray-300 dark:border-gray-600 text-black dark:text-white p-4 space-y-3">
+    <div className="rounded-[var(--gui-radius)] border border-[var(--gui-border)] bg-[var(--gui-bg)] text-[var(--gui-text)] p-4 space-y-3">
       <h3 className="font-semibold">{title}</h3>
       <table className="text-sm w-full">
         <thead>
           <tr>
             {columns.map((c) => (
-              <th key={c.key} className="text-left border-b border-gray-300 dark:border-gray-600 py-1 font-medium">
+              <th key={c.key} className="text-left border-b border-[var(--gui-border)] py-1 font-medium">
                 {c.label}
               </th>
             ))}
@@ -31,7 +31,7 @@ export function TableRenderer({
           {rows.map((row, i) => (
             <tr key={i}>
               {columns.map((c) => (
-                <td key={c.key} className="border-t border-gray-200 dark:border-gray-700 py-1">
+                <td key={c.key} className="border-t border-[var(--gui-border-subtle)] py-1">
                   {String(row[c.key] ?? "")}
                 </td>
               ))}

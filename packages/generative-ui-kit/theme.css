@@ -1,0 +1,45 @@
+/**
+ * Default design tokens for generative-ui-kit's renderers.
+ * A host overrides these once, globally, instead of overriding Tailwind
+ * classes per-component. Import this file once (e.g. in your root layout):
+ *
+ *   import "generative-ui-kit/theme.css";
+ *
+ * To customize, redeclare any subset of these variables at a later cascade
+ * point (e.g. your own `:root` block, or scoped to a wrapper element).
+ */
+
+:root {
+  --gui-bg: #ffffff;
+  --gui-bg-subtle: #f9fafb;
+  --gui-bg-hover: #f3f4f6;
+  --gui-border: #d1d5db;
+  --gui-border-subtle: #e5e7eb;
+  --gui-text: #000000;
+  --gui-text-muted: #6b7280;
+  --gui-accent-bg: #000000;
+  --gui-accent-text: #ffffff;
+  --gui-error: #ef4444;
+  --gui-success: #16a34a;
+  --gui-radius: 0.5rem;
+  --gui-chart-1: #3b82f6;
+  --gui-chart-2: #3b82f6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --gui-bg: #171717;
+    --gui-bg-subtle: #262626;
+    --gui-bg-hover: #262626;
+    --gui-border: #525252;
+    --gui-border-subtle: #404040;
+    --gui-text: #ffffff;
+    --gui-text-muted: #9ca3af;
+    --gui-accent-bg: #ffffff;
+    --gui-accent-text: #000000;
+    --gui-error: #f87171;
+    --gui-success: #4ade80;
+    --gui-chart-1: #60a5fa;
+    --gui-chart-2: #60a5fa;
+  }
+}

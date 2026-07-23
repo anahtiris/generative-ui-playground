@@ -101,7 +101,7 @@ export function GenerativeChat({
               return (
                 <div
                   key={i}
-                  className="ml-auto max-w-[80%] rounded-lg bg-black text-white dark:bg-white dark:text-black px-3 py-2 text-sm"
+                  className="ml-auto max-w-[80%] rounded-[var(--gui-radius)] bg-[var(--gui-accent-bg)] text-[var(--gui-accent-text)] px-3 py-2 text-sm"
                 >
                   {t.text}
                 </div>
@@ -111,7 +111,7 @@ export function GenerativeChat({
               return (
                 <div
                   key={i}
-                  className="max-w-[80%] rounded-lg border border-gray-300 dark:border-gray-600 text-black dark:text-white px-3 py-2 text-sm"
+                  className="max-w-[80%] rounded-[var(--gui-radius)] border border-[var(--gui-border)] text-[var(--gui-text)] px-3 py-2 text-sm"
                 >
                   {t.text}
                 </div>
@@ -123,8 +123,8 @@ export function GenerativeChat({
               </div>
             );
           })}
-          {loading && <p className="text-sm text-gray-500 dark:text-gray-400">Thinking...</p>}
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {loading && <p className="text-sm text-[var(--gui-text-muted)]">Thinking...</p>}
+          {error && <p className="text-sm text-[var(--gui-error)]">{error}</p>}
         </div>
 
         <SuggestionChips suggestions={remainingSuggestions} onPick={handleSuggestionPick} disabled={loading} />
@@ -134,12 +134,12 @@ export function GenerativeChat({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type a message…"
-            className="flex-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 text-black dark:text-white px-3 py-2 text-sm"
+            className="flex-1 rounded-[var(--gui-radius)] border border-[var(--gui-border)] bg-[var(--gui-bg)] text-[var(--gui-text)] px-3 py-2 text-sm"
           />
           <button
             type="submit"
             disabled={loading}
-            className="rounded bg-black text-white dark:bg-white dark:text-black px-4 py-2 text-sm disabled:opacity-50"
+            className="rounded-[var(--gui-radius)] bg-[var(--gui-accent-bg)] text-[var(--gui-accent-text)] px-4 py-2 text-sm disabled:opacity-50"
           >
             Send
           </button>
