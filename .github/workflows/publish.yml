@@ -24,7 +24,7 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run typecheck
+      - run: pnpm --filter generative-ui-kit run typecheck
       - run: pnpm --filter generative-ui-kit run build
 
       - name: Publish to npm
