@@ -1,7 +1,8 @@
 {
   "name": "generative-ui-kit",
   "version": "0.1.0",
-  "private": true,
+  "description": "Provider-agnostic generative UI components (secure forms, questions, tables, dashboards) and a GenerativeChat widget for tool-calling LLM chat apps.",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

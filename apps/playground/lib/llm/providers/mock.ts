@@ -10,7 +10,8 @@ import { mockScenarios } from "../../../mock/fixtures";
  *   1. If the previous turn was a tool_result, return a plain text
  *      "wrap up" message instead of another tool call.
  *   2. If the latest user message contains a scenario keyword
- *      ("form", "dashboard", "blackboard"/"diagram"), return that scenario.
+ *      ("form", "dashboard", "table", "question", "floating ..."), return
+ *      that scenario.
  *   3. Otherwise return a sample text reply (no tool call).
  */
 export const mockProvider: LLMProvider = {

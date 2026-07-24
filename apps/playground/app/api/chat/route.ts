@@ -4,8 +4,6 @@ import {
   formToolHandler,
   dashboardToolDefinition,
   dashboardToolHandler,
-  diagramToolDefinition,
-  diagramToolHandler,
   questionToolDefinition,
   questionToolHandler,
   tableToolDefinition,
@@ -16,18 +14,19 @@ import type { ChatMessage } from "generative-ui-kit";
 const SYSTEM_PROMPT = `
 You are an assistant for a relocation platform. When you need the user to
 submit sensitive personal data, call request_form — never ask for it in
-plain chat text. Use request_dashboard, request_diagram, and request_table
-to visualize data or explain processes when it would help the user. Use
-ask_question when you need a specific answer from the user to proceed —
-pick "buttons" for a quick pick among short labels, "radio" for a single
-pick among longer option text, and "checkboxes" when more than one answer
-can apply at once.
+plain chat text. Use request_dashboard and request_table to visualize data
+when it would help the user. Use ask_question when you need a specific
+answer from the user to proceed — pick "buttons" for a quick pick among
+short labels, "radio" for a single pick among longer option text, and
+"checkboxes" when more than one answer can apply at once. Every render
+tool accepts an optional "style": "normal" (inline in chat, default) or
+"float" (anchored overlay card) — use "float" for something the user
+should keep visible while the conversation continues.
 `.trim();
 
 const allTools = [
   formToolDefinition,
   dashboardToolDefinition,
-  diagramToolDefinition,
   questionToolDefinition,
   tableToolDefinition,
 ];
@@ -41,7 +40,6 @@ type ToolHandler = (input: Record<string, unknown>) => Promise<{ render: unknown
 const toolHandlers: Record<string, ToolHandler> = {
   request_form: formToolHandler as ToolHandler,
   request_dashboard: dashboardToolHandler as ToolHandler,
-  request_diagram: diagramToolHandler as ToolHandler,
   ask_question: questionToolHandler as ToolHandler,
   request_table: tableToolHandler as ToolHandler,
 };

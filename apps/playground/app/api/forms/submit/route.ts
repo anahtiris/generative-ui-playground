@@ -16,9 +16,17 @@ export async function POST(req: Request) {
 
   const supabaseAdmin = getSupabaseAdmin();
   if (!supabaseAdmin) {
-    // No Supabase configured yet — skip the write so the chat/form flow
-    // isn't blocked. Nothing is persisted in this mode.
-    return Response.json({ status: "submitted_no_backend", sessionId });
+    // No Supabase configured — nothing is persisted, but the 3 FormSubmitResult
+    // branches still need to be testable. Type "error" or "pending" into any
+    // field to simulate that outcome; anything else simulates success.
+    const rawValues = Object.values(values as Record<string, string>).map((v) => String(v).trim().toLowerCase());
+    if (rawValues.includes("error")) {
+      return Response.json({ status: "error", message: "Simulated failure (no backend configured)" });
+    }
+    if (rawValues.includes("pending")) {
+      return Response.json({ status: "pending_reference", referenceNumber: `MOCK-${sessionId.slice(0, 8).toUpperCase()}` });
+    }
+    return Response.json({ status: "submitted" });
   }
 
   // In production: validate sessionId against a `form_sessions` row,

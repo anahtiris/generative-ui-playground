@@ -2,12 +2,25 @@
 
 import { useState } from "react";
 
+export interface FieldValidation {
+  pattern?: string; // text/email only — native HTML pattern attribute
+  minLength?: number; // text/email/textarea
+  maxLength?: number; // text/email/textarea
+  min?: number | string; // number: number; date: ISO string (e.g. "2010-01-01")
+  max?: number | string; // number: number; date: ISO string (e.g. "2010-01-01")
+}
+
 export interface Field {
   name: string;
   label: string;
   type: "string" | "date" | "email" | "file" | "number" | "select" | "checkbox" | "textarea";
   required: boolean;
   options?: string[]; // required when type === "select"
+  placeholder?: string;
+  // Native browser constraint validation only — the form won't submit until
+  // these pass. Anything more complex (cross-field, server-side lookups)
+  // stays the submit endpoint's job; see apps/playground/app/api/forms/submit.
+  validation?: FieldValidation;
 }
 
 export type FormSubmitResult =
@@ -88,15 +101,25 @@ export function SecureFormRenderer({
       return (
         <textarea
           required={f.required}
+          placeholder={f.placeholder}
+          minLength={f.validation?.minLength}
+          maxLength={f.validation?.maxLength}
           onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))}
           className="rounded-[var(--gui-radius)] border border-[var(--gui-border)] bg-[var(--gui-bg)] text-[var(--gui-text)] px-2 py-1"
         />
       );
     }
+    const isNumberOrDate = f.type === "number" || f.type === "date";
     return (
       <input
-        type={f.type === "file" ? "file" : f.type === "date" ? "date" : "text"}
+        type={f.type === "file" ? "file" : f.type === "date" ? "date" : f.type === "number" ? "number" : f.type === "email" ? "email" : "text"}
         required={f.required}
+        placeholder={f.placeholder}
+        pattern={!isNumberOrDate ? f.validation?.pattern : undefined}
+        minLength={!isNumberOrDate ? f.validation?.minLength : undefined}
+        maxLength={!isNumberOrDate ? f.validation?.maxLength : undefined}
+        min={isNumberOrDate ? f.validation?.min : undefined}
+        max={isNumberOrDate ? f.validation?.max : undefined}
         onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))}
         className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 text-black dark:text-white px-2 py-1"
       />

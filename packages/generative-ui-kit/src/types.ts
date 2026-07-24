@@ -44,3 +44,9 @@ export interface Suggestion {
   label: string;
   sampleMessage: string;
 }
+
+// GenerativeChat's own container: "normal" renders inline wherever the host
+// places it (current behavior). "float" renders as a fixed-corner launcher
+// bubble that opens into a fixed-position panel — the whole widget, not any
+// one rendered card.
+export type ChatLayout = "normal" | "float";

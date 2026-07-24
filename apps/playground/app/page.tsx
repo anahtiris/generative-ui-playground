@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { GenerativeChat, defaultRenderers } from "generative-ui-kit";
-import type { ChatMessage, ChatStreamEvent, RenderPayload, Suggestion, FormSubmitResult } from "generative-ui-kit";
+import type { ChatLayout, ChatMessage, ChatStreamEvent, RenderPayload, Suggestion, FormSubmitResult } from "generative-ui-kit";
 import { mockScenarios } from "../mock/fixtures";
 
 const PROVIDERS = [
   { id: "mock", label: "Mock (no API calls)" },
   { id: "anthropic", label: "Claude (Anthropic)" },
   { id: "openai", label: "GPT (OpenAI)" },
+  { id: "ollama", label: "Ollama (local)" },
 ];
 
 // Computed once at module scope, not inside the component body: GenerativeChat
@@ -34,8 +35,9 @@ async function submitForm(sessionId: string, values: Record<string, string>): Pr
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sessionId, values }),
     });
-    if (!res.ok) return { status: "error", message: "Submission failed" };
-    return { status: "submitted" };
+    const data = await res.json();
+    if (!res.ok) return { status: "error", message: data.error ?? "Submission failed" };
+    return data as FormSubmitResult;
   } catch {
     return { status: "error", message: "Submission failed" };
   }
@@ -43,6 +45,7 @@ async function submitForm(sessionId: string, values: Record<string, string>): Pr
 
 export default function Home() {
   const [providerId, setProviderId] = useState("mock");
+  const [layout, setLayout] = useState<ChatLayout>("normal");
 
   async function* onSend(messages: ChatMessage[]): AsyncIterable<ChatStreamEvent> {
     const res = await fetch("/api/chat", {
@@ -84,20 +87,30 @@ export default function Home() {
     <main className="mx-auto max-w-2xl p-6 space-y-4 bg-white text-black dark:bg-neutral-900 dark:text-white min-h-screen">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Generative UI Chat</h1>
-        <select
-          value={providerId}
-          onChange={(e) => setProviderId(e.target.value)}
-          className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 px-2 py-1 text-sm"
-        >
-          {PROVIDERS.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.label}
-            </option>
-          ))}
-        </select>
+        <div className="flex items-center gap-2">
+          <select
+            value={layout}
+            onChange={(e) => setLayout(e.target.value as ChatLayout)}
+            className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 px-2 py-1 text-sm"
+          >
+            <option value="normal">Normal layout</option>
+            <option value="float">Floating layout</option>
+          </select>
+          <select
+            value={providerId}
+            onChange={(e) => setProviderId(e.target.value)}
+            className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 px-2 py-1 text-sm"
+          >
+            {PROVIDERS.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      <GenerativeChat onSend={onSend} suggestions={suggestions} renderers={defaultRenderers} />
+      <GenerativeChat onSend={onSend} suggestions={suggestions} renderers={defaultRenderers} layout={layout} />
     </main>
   );
 }

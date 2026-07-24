@@ -1,11 +1,13 @@
 import { anthropicProvider } from "./providers/anthropic";
 import { openaiProvider } from "./providers/openai";
+import { ollamaProvider } from "./providers/ollama";
 import { mockProvider } from "./providers/mock";
 import type { LLMProvider } from "./types";
 
 const registry: Record<string, LLMProvider> = {
   anthropic: anthropicProvider,
   openai: openaiProvider,
+  ollama: ollamaProvider,
   mock: mockProvider,
 };
 

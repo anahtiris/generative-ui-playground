@@ -5,6 +5,7 @@ export type {
   RenderPayload,
   ChatStreamEvent,
   Suggestion,
+  ChatLayout,
 } from "./types";
 
 export { GenerativeUIRouter } from "./GenerativeUIRouter";

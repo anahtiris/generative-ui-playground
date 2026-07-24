@@ -9,7 +9,6 @@ export const formToolDefinition: ToolDefinition = {
   input_schema: {
     type: "object",
     properties: {
-      form_type: { type: "string", enum: ["identity_verification", "bank_details", "document_upload"] },
       purpose: { type: "string", description: "User-facing reason this data is needed." },
       fields: {
         type: "array",
@@ -24,19 +23,41 @@ export const formToolDefinition: ToolDefinition = {
             },
             required: { type: "boolean" },
             options: { type: "array", items: { type: "string" }, description: "Required when type is 'select'." },
+            placeholder: { type: "string" },
+            validation: {
+              type: "object",
+              description:
+                "Native browser constraint validation — the form won't submit until these pass. " +
+                "pattern/minLength/maxLength apply to string/email/textarea fields; min/max apply " +
+                "to number/date fields. Anything more complex belongs server-side, not here.",
+              properties: {
+                pattern: { type: "string" },
+                minLength: { type: "number" },
+                maxLength: { type: "number" },
+                min: { type: ["number", "string"], description: "number for number fields, ISO date string for date fields." },
+                max: { type: ["number", "string"], description: "number for number fields, ISO date string for date fields." },
+              },
+            },
           },
           required: ["name", "label", "type", "required"],
         },
       },
     },
-    required: ["form_type", "purpose", "fields"],
+    required: ["purpose", "fields"],
   },
 };
 
 export async function formToolHandler(input: {
-  form_type: string;
   purpose: string;
-  fields: Array<{ name: string; label: string; type: string; required: boolean; options?: string[] }>;
+  fields: Array<{
+    name: string;
+    label: string;
+    type: string;
+    required: boolean;
+    options?: string[];
+    placeholder?: string;
+    validation?: { pattern?: string; minLength?: number; maxLength?: number; min?: number | string; max?: number | string };
+  }>;
 }) {
   // Global `crypto.randomUUID()` (Web Crypto API), not Node's `crypto` module
   // import — this handler is a library export that could run in any host's
