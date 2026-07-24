@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "description": "Provider-agnostic generative UI components (secure forms, questions, tables, dashboards) and a GenerativeChat widget for tool-calling LLM chat apps.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anahtiris/generative-ui-playground.git",
+    "directory": "packages/generative-ui-kit"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
