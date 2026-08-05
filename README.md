@@ -8,10 +8,11 @@ any real API key.
 **v1 scope:** 4 renderers — secure forms, questions, tables, dashboards —
 plus `GenerativeChat` itself in 2 layouts: `"normal"` (renders inline
 wherever the host places it, current look) or `"float"` (fixed-corner
-launcher bubble that opens into a fixed-position chat panel). A 5th
-renderer, `BlackboardRenderer` (diagrams), exists in the package and is
-exported, but is not part of the default registry or the demo app's wired
-tools — see [Not included](#not-included-intentionally--v1-scope) below.
+launcher bubble that opens into a fixed-position chat panel). 2 more
+renderers, `BlackboardRenderer` (diagrams) and `ScrollToAnchorRenderer`
+(scroll-to-element), exist in the package and are exported, but aren't
+part of the default registry or the demo app's wired tools — see
+[Not included](#not-included-intentionally--v1-scope) below.
 
 This is a pnpm workspace with two packages:
 
@@ -23,9 +24,9 @@ packages/generative-ui-kit/   the publishable library — no LLM calls of its ow
   src/SuggestionChips.tsx         stateless chip row
   src/sendMessageContext.tsx      useSendMessage() — lets a renderer send a normal next chat message
   src/renderers/                  SecureFormRenderer, DashboardRenderer, QuestionRenderer, TableRenderer (v1 default set)
-                                   + BlackboardRenderer (exported, not in defaultRenderers — opt-in only)
+                                   + BlackboardRenderer, ScrollToAnchorRenderer (exported, not in defaultRenderers — opt-in only)
   src/tools/                      matching tool schema + handler for each renderer (request_form, request_dashboard, ask_question, request_table)
-                                   + request_diagram (exported, not wired into the demo app)
+                                   + request_diagram, scroll_to_anchor (exported, not wired into the demo app)
 
 apps/playground/              the demo app — consumes generative-ui-kit
   app/page.tsx                    renders <GenerativeChat>, supplies onSend + defaultRenderers
@@ -119,6 +120,9 @@ pnpm run build          # build the library, then the app against it
   exist and are exported from `generative-ui-kit`, but aren't in
   `defaultRenderers` or wired into the playground's `route.ts`/system
   prompt. A host can still import and register both manually.
+- `ScrollToAnchorRenderer` / `scroll_to_anchor` — same deal: exported, not
+  in `defaultRenderers`, not wired into the playground. Renders nothing;
+  the tool call's only effect is `scrollIntoView` on a matching DOM id.
 - Auth — plug in whatever you use (Supabase Auth, NextAuth, etc.)
 - Real encryption of `form_submissions.values_encrypted` — currently
   inserted as plaintext in `apps/playground/app/api/forms/submit/route.ts`

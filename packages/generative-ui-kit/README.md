@@ -25,6 +25,9 @@ Peer dependencies: `react` and `react-dom` (^18).
   `TableRenderer` (`request_table`), `DashboardRenderer` (`request_dashboard`)
 - `BlackboardRenderer` (`request_diagram`) — exported but not in
   `defaultRenderers`; register it yourself if you want diagrams
+- `ScrollToAnchorRenderer` (`scroll_to_anchor`) — exported but not in
+  `defaultRenderers`; renders nothing, just scrolls an existing element
+  (by DOM id) into view
 
 ## Quick start
 
