@@ -1,48 +1,18 @@
 import { getProvider } from "../../../lib/llm";
-import {
-  formToolDefinition,
-  formToolHandler,
-  dashboardToolDefinition,
-  dashboardToolHandler,
-  questionToolDefinition,
-  questionToolHandler,
-  tableToolDefinition,
-  tableToolHandler,
-} from "generative-ui-kit";
+import { builtinTools, createToolRegistry } from "generative-ui-kit";
 import type { ChatMessage } from "generative-ui-kit";
 
-const SYSTEM_PROMPT = `
-You are an assistant for a relocation platform. When you need the user to
-submit sensitive personal data, call request_form — never ask for it in
-plain chat text. Use request_dashboard and request_table to visualize data
-when it would help the user. Use ask_question when you need a specific
-answer from the user to proceed — pick "buttons" for a quick pick among
-short labels, "radio" for a single pick among longer option text, and
-"checkboxes" when more than one answer can apply at once. Every render
-tool accepts an optional "style": "normal" (inline in chat, default) or
-"float" (anchored overlay card) — use "float" for something the user
-should keep visible while the conversation continues.
+// Per-tool guidance lives with each tool (ToolModule.promptHint); this is
+// only the host's own context. To add a tool: put it in this list.
+const BASE_PROMPT = `
+You are an assistant for a relocation platform. Every render tool accepts an
+optional "style": "normal" (inline in chat, default) or "float" (anchored
+overlay card) — use "float" for something the user should keep visible while
+the conversation continues.
 `.trim();
 
-const allTools = [
-  formToolDefinition,
-  dashboardToolDefinition,
-  questionToolDefinition,
-  tableToolDefinition,
-];
-
-type ToolHandler = (input: Record<string, unknown>) => Promise<{ render: unknown; forModel: unknown }>;
-
-// Registry boundary cast: same reasoning as generative-ui-kit's defaultRenderers
-// (see packages/generative-ui-kit/src/renderers/index.ts) — each handler's
-// input type is more specific than Record<string, unknown>, so a targeted
-// cast per entry, not a blanket `any`.
-const toolHandlers: Record<string, ToolHandler> = {
-  request_form: formToolHandler as ToolHandler,
-  request_dashboard: dashboardToolHandler as ToolHandler,
-  ask_question: questionToolHandler as ToolHandler,
-  request_table: tableToolHandler as ToolHandler,
-};
+const registry = createToolRegistry(builtinTools);
+const SYSTEM_PROMPT = registry.systemPrompt(BASE_PROMPT);
 
 export async function POST(req: Request) {
   const { messages, providerId } = (await req.json()) as {
@@ -51,25 +21,23 @@ export async function POST(req: Request) {
   };
 
   const provider = getProvider(providerId);
-  const response = await provider.send({ system: SYSTEM_PROMPT, messages, tools: allTools });
+  const response = await provider.send({ system: SYSTEM_PROMPT, messages, tools: registry.definitions() });
 
   if (response.type === "text") {
     return Response.json({ type: "text", text: response.text });
   }
 
-  const handler = toolHandlers[response.name];
-  if (!handler) {
-    return Response.json({ type: "text", text: `(no handler registered for tool "${response.name}")` });
+  const result = await registry.execute(response.name, response.input);
+  if (!result.ok) {
+    return Response.json({ type: "text", text: `(${result.error})` });
   }
-
-  const { render, forModel } = await handler(response.input);
 
   return Response.json({
     type: "tool_call",
     toolCallId: response.id,
     toolName: response.name,
     input: response.input,
-    render,
-    forModel,
+    render: result.output.render,
+    forModel: result.output.forModel,
   });
 }

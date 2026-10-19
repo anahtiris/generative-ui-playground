@@ -31,16 +31,40 @@ Peer dependencies: `react` and `react-dom` (^18).
 
 ## Quick start
 
-Server side — register the tool definitions with your LLM provider, and its
-handlers to turn a tool call into a render payload:
+Server side — build a registry from the built-in tools. It hands your LLM
+provider the tool list and system prompt, and turns a tool call into a render
+payload:
 
 ```ts
-import { formToolDefinition, formToolHandler, /* ... */ } from "generative-ui-kit";
+import { createToolRegistry, builtinTools } from "generative-ui-kit";
 
-const tools = [formToolDefinition /* ... */];
-const { render, forModel } = await formToolHandler(toolCallInput);
-// `render` -> send to the client. `forModel` -> the tool_result you feed back to the LLM.
+const registry = createToolRegistry(builtinTools);
+
+registry.definitions();               // tool list for your LLM provider
+registry.systemPrompt(BASE_PROMPT);   // your prompt + each tool's hint
+
+const result = await registry.execute(toolCall.name, toolCall.input);
+if (result.ok) {
+  const { render, forModel } = result.output;
+  // `render` -> send to the client. `forModel` -> the tool_result you feed back to the LLM.
+} else {
+  // unknown tool name: result.error
+}
 ```
+
+Upgrading the package brings new built-in tools with no code change on your
+side. Opt-in tools and your own take one line:
+
+```ts
+import { defineTool, diagramTool, scrollToAnchorTool } from "generative-ui-kit";
+
+const weatherTool = defineTool(weatherDefinition, weatherHandler, "Use get_weather for forecasts.");
+createToolRegistry([...builtinTools, scrollToAnchorTool, weatherTool]);
+```
+
+An opt-in tool also needs its renderer registered client-side. The individual
+`*ToolDefinition` / `*ToolHandler` exports still work if you'd rather wire
+tools by hand.
 
 Client side — render whatever payload comes back:
 
