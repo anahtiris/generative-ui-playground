@@ -8,6 +8,10 @@ export type {
   ChatLayout,
 } from "./types";
 
+export type { ToolModule, ToolOutput, ToolRegistry, ToolResult } from "./registry/types";
+export { createToolRegistry, defineTool } from "./registry/createToolRegistry";
+export { builtinTools, diagramTool, scrollToAnchorTool } from "./tools";
+
 export { GenerativeUIRouter } from "./GenerativeUIRouter";
 export type { RendererMap } from "./GenerativeUIRouter";
 

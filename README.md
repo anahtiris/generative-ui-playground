@@ -27,6 +27,8 @@ packages/generative-ui-kit/   the publishable library — no LLM calls of its ow
                                    + BlackboardRenderer, ScrollToAnchorRenderer (exported, not in defaultRenderers — opt-in only)
   src/tools/                      matching tool schema + handler for each renderer (request_form, request_dashboard, ask_question, request_table)
                                    + request_diagram, scroll_to_anchor (exported, not wired into the demo app)
+  src/registry/                   createToolRegistry / defineTool — one ToolModule per tool (definition + handler + promptHint);
+                                   definitions() and execute() mirror MCP's tools/list and tools/call
 
 apps/playground/              the demo app — consumes generative-ui-kit
   app/page.tsx                    renders <GenerativeChat>, supplies onSend + defaultRenderers
@@ -102,10 +104,15 @@ pending-reference state, anything else submits normally.
 1. Add a tool schema + handler in `packages/generative-ui-kit/src/tools/`
    (split `render` / `forModel`)
 2. Add the renderer component under `packages/generative-ui-kit/src/renderers/`
-3. Export both from `packages/generative-ui-kit/src/index.ts`, and add the
-   renderer to `defaultRenderers` in `src/renderers/index.ts`
-4. Wire the tool definition/handler into `apps/playground/app/api/chat/route.ts`
-5. (optional) Add a mock scenario in `apps/playground/mock/fixtures.ts` for demoing it
+3. Wrap the tool with `defineTool(definition, handler, promptHint?)` in
+   `src/tools/index.ts` and add it to `builtinTools` (or export it separately
+   for opt-in, like `diagramTool`). The prompt hint replaces hand-editing the
+   system prompt.
+4. Export the renderer from `src/index.ts` and add it to `defaultRenderers` in
+   `src/renderers/index.ts`
+5. Nothing to wire in `apps/playground/app/api/chat/route.ts` — it builds its
+   registry from `builtinTools`, so a new built-in tool is picked up on rebuild
+6. (optional) Add a mock scenario in `apps/playground/mock/fixtures.ts` for demoing it
 
 ## Workspace commands
 
